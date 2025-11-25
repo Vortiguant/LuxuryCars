@@ -22,6 +22,9 @@ import {
   updateVehicleRate,
   moderateReview,
   getPublicReviews
+  getUsers,
+  updateUserRole,
+  updateUserPassword
 } from "./state.js";
 import { renderVehicles, renderComparison, renderReviews, renderAdminTables, setMetrics, setAverageRating } from "./ui.js";
 
@@ -40,6 +43,7 @@ const bookingConfirmation = document.getElementById("booking-confirmation");
 const authModal = document.getElementById("auth-modal");
 const profileModal = document.getElementById("profile-modal");
 const profileForm = document.getElementById("profile-form");
+const adminSection = document.getElementById("admin");
 const toast = document.getElementById("toast");
 const reviewGrid = document.getElementById("review-grid");
 const reviewForm = document.getElementById("review-form");
@@ -50,6 +54,14 @@ const heroTitle = document.querySelector(".hero-visual h3");
 const heroPill = document.querySelector(".hero-visual .pill");
 const heroImage = document.querySelector(".hero-car img");
 const pageTransition = document.getElementById("page-transition");
+const adminRolePill = document.getElementById("admin-role-pill");
+const adminUserPanel = document.getElementById("admin-user-panel");
+const adminUserList = document.getElementById("admin-user-list");
+const passwordResetForm = document.getElementById("password-reset-form");
+const passwordUserSelect = document.getElementById("password-user");
+const passwordNew = document.getElementById("password-new");
+const selfPasswordForm = document.getElementById("self-password-form");
+const selfPasswordInput = document.getElementById("self-new-password");
 
 let selectedVehicle = null;
 let activeFeatures = [];
@@ -62,6 +74,35 @@ function refreshOperationalUI() {
   setMetrics(getAnalytics());
   renderReviews(reviewGrid, getPublicReviews());
   setAverageRating(getAverageRating(), getPublicReviews().length);
+function isAdminSession() {
+  return currentUser()?.role === "admin";
+}
+
+function clearAdminContent() {
+  document.getElementById("admin-fleet")?.replaceChildren();
+  document.getElementById("admin-bookings")?.replaceChildren();
+  document.getElementById("admin-reviews")?.replaceChildren();
+  document.getElementById("metric-occupancy")?.textContent = "--";
+  document.getElementById("metric-ticket")?.textContent = "--";
+  document.getElementById("metric-nps")?.textContent = "--";
+}
+
+function syncAdminDashboard() {
+  if (!adminSection) return;
+  const isAdmin = isAdminSession();
+  adminSection.classList.toggle("hidden", !isAdmin);
+  if (!isAdmin) {
+    clearAdminContent();
+    return;
+  }
+  renderAdminTables(getAdminTables());
+  setMetrics(getAnalytics());
+}
+
+function refreshAdminDataIfActive() {
+  if (!isAdminSession()) return;
+  renderAdminTables(getAdminTables());
+  setMetrics(getAnalytics());
 }
 
 function showToast(message) {
@@ -256,6 +297,7 @@ function attachBooking() {
       bookingStep.classList.add("hidden");
       bookingConfirmation.classList.remove("hidden");
       refreshOperationalUI();
+      refreshAdminDataIfActive();
       showToast("Booking confirmed");
     } catch (err) {
       showToast(err.message);
@@ -326,6 +368,50 @@ function attachAuth() {
   });
 }
 
+function renderAdminUsers() {
+  if (!adminUserList) return;
+  const users = getUsers();
+  adminUserList.innerHTML = users
+    .map(
+      (user) => `
+        <div class="user-row" data-user="${user.id}">
+          <div class="user-meta">
+            <strong>${user.name || "Unnamed"}</strong>
+            <span class="muted">${user.email}</span>
+          </div>
+          <label class="role-control">
+            <span>Role</span>
+            <select data-role-select data-user="${user.id}">
+              <option value="guest" ${user.role === "guest" ? "selected" : ""}>Guest</option>
+              <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
+            </select>
+          </label>
+        </div>
+      `
+    )
+    .join("");
+
+  if (passwordUserSelect) {
+    passwordUserSelect.innerHTML = users
+      .map((user) => `<option value="${user.id}">${user.name || user.email}</option>`)
+      .join("");
+  }
+}
+
+function syncAdminUI() {
+  const user = currentUser();
+  const isAdmin = user?.role === "admin";
+  if (adminRolePill) {
+    adminRolePill.textContent = `Role: ${isAdmin ? "Admin" : "Guest"}`;
+  }
+
+  if (adminUserPanel) {
+    adminUserPanel.classList.toggle("hidden", !isAdmin);
+    if (isAdmin) renderAdminUsers();
+    else if (passwordUserSelect) passwordUserSelect.innerHTML = "";
+  }
+}
+
 function updateSessionUI() {
   const user = currentUser();
   const nav = document.querySelector(".nav-links");
@@ -340,6 +426,7 @@ function updateSessionUI() {
         const current = currentUser();
         profileForm.name.value = current?.name || "";
         profileForm.email.value = current?.email || "";
+        if (current?.role === "admin") renderAdminUsers();
         profileModal.classList.remove("hidden");
       });
     }
@@ -362,6 +449,9 @@ function updateSessionUI() {
     document.getElementById("nav-profile")?.remove();
     document.getElementById("nav-logout")?.remove();
   }
+
+  syncAdminUI();
+  syncAdminDashboard();
 }
 
 function attachProfile() {
@@ -373,6 +463,57 @@ function attachProfile() {
       showToast("Profile updated");
       closeModals();
       updateSessionUI();
+    } catch (err) {
+      showToast(err.message);
+    }
+  });
+}
+
+function attachAdminManagement() {
+  adminUserList?.addEventListener("change", async (event) => {
+    const select = event.target.closest("[data-role-select]");
+    if (!select) return;
+    const { user: userId } = select.dataset;
+    try {
+      await updateUserRole(userId, select.value);
+      showToast("Role updated");
+      renderAdminUsers();
+      updateSessionUI();
+    } catch (err) {
+      showToast(err.message);
+      renderAdminUsers();
+    }
+  });
+
+  passwordResetForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const userId = passwordUserSelect?.value;
+    const newPassword = passwordNew?.value.trim();
+    if (!userId) {
+      showToast("Select an account to update");
+      return;
+    }
+    try {
+      await updateUserPassword(userId, newPassword);
+      if (passwordNew) passwordNew.value = "";
+      showToast("Password updated");
+    } catch (err) {
+      showToast(err.message);
+    }
+  });
+
+  selfPasswordForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const user = currentUser();
+    const newPassword = selfPasswordInput?.value.trim();
+    if (!user) {
+      showToast("Login required");
+      return;
+    }
+    try {
+      await updateUserPassword(user.id, newPassword);
+      if (selfPasswordInput) selfPasswordInput.value = "";
+      showToast("Password updated");
     } catch (err) {
       showToast(err.message);
     }
@@ -396,6 +537,7 @@ function attachReviews() {
     refreshOperationalUI();
     reviewForm.reset();
     showToast("Review submitted for moderation");
+    refreshAdminDataIfActive();
   });
 }
 
@@ -603,10 +745,10 @@ function init() {
   attachContact();
   attachProfile();
   attachAdminActions();
+  attachAdminManagement();
   attachNav();
   animateScroll();
   updateSessionUI();
-  initAdmin();
   applyFilters();
   renderComparison(compareSlots, getCompareVehicles());
   cycleHero();
