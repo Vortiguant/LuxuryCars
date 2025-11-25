@@ -17,6 +17,31 @@ const uuid = () =>
     ? crypto.randomUUID()
     : `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
+const encoder = typeof TextEncoder !== "undefined" ? new TextEncoder() : null;
+
+async function hashPassword(password) {
+  if (!password) return "";
+
+  if (typeof crypto !== "undefined" && crypto.subtle?.digest && encoder) {
+    const hashBuffer = await crypto.subtle.digest("SHA-256", encoder.encode(password));
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  // Legacy fallback for environments without SubtleCrypto (demo-only, not secure)
+  let hash = 0;
+  for (let i = 0; i < password.length; i += 1) {
+    hash = (hash << 5) - hash + password.charCodeAt(i);
+    hash |= 0; // Convert to 32-bit integer
+  }
+  return `legacy-${Math.abs(hash)}`;
+}
+
+function isHashed(password) {
+  return typeof password === "string" && /^[a-f0-9]{64}$/i.test(password);
+}
+
 function load(key, fallback = []) {
   if (!hasStorage) return clone(fallback);
   try {
@@ -39,14 +64,40 @@ let compare = load(STORAGE_KEYS.compare, []);
 let contacts = load(STORAGE_KEYS.contacts, []);
 let session = load(STORAGE_KEYS.session, null);
 
+async function ensureHashedUsers() {
+  const transformed = [];
+  let changed = false;
+
+  for (const user of users) {
+    if (isHashed(user.password)) {
+      transformed.push(user);
+      continue;
+    }
+    const hashedPassword = await hashPassword(user.password || "");
+    transformed.push({ ...user, password: hashedPassword });
+    changed = true;
+  }
+
+  if (changed) {
+    users = transformed;
+    save(STORAGE_KEYS.users, users);
+  } else {
+    users = transformed;
+  }
+}
+
+const usersReady = ensureHashedUsers();
+
 export function getSession() {
   return session;
 }
 
-export function registerUser({ name, email, password }) {
+export async function registerUser({ name, email, password }) {
+  await usersReady;
   const exists = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
   if (exists) throw new Error("Account already exists");
-  const user = { id: uuid(), name, email, password, role: "guest" };
+  const hashedPassword = await hashPassword(password);
+  const user = { id: uuid(), name, email, password: hashedPassword, role: "guest" };
   users.push(user);
   save(STORAGE_KEYS.users, users);
   session = { userId: user.id };
@@ -54,9 +105,11 @@ export function registerUser({ name, email, password }) {
   return user;
 }
 
-export function loginUser({ email, password }) {
+export async function loginUser({ email, password }) {
+  await usersReady;
+  const hashedPassword = await hashPassword(password);
   const user = users.find(
-    (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+    (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === hashedPassword
   );
   if (!user) throw new Error("Invalid credentials");
   session = { userId: user.id };

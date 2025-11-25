@@ -137,5 +137,11 @@ export const seedReviews = [
 ];
 
 export const seedUsers = [
-  { id: "admin", name: "Admin", email: "admin@aurumdrive.com", password: "admin123", role: "admin" }
+  {
+    id: "admin",
+    name: "Admin",
+    email: "admin@aurumdrive.com",
+    password: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    role: "admin"
+  }
 ];

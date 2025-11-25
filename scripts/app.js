@@ -252,11 +252,11 @@ function attachAuth() {
     })
   );
 
-  loginForm.addEventListener("submit", (e) => {
+  loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = new FormData(loginForm);
     try {
-      loginUser({ email: data.get("email"), password: data.get("password") });
+      await loginUser({ email: data.get("email"), password: data.get("password") });
       showToast("Signed in");
       closeModals();
       updateSessionUI();
@@ -265,11 +265,11 @@ function attachAuth() {
     }
   });
 
-  registerForm.addEventListener("submit", (e) => {
+  registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = new FormData(registerForm);
     try {
-      registerUser({
+      await registerUser({
         name: data.get("name"),
         email: data.get("email"),
         password: data.get("password")
