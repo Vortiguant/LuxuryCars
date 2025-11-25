@@ -133,7 +133,22 @@ export function getUserBookings(userId) {
 }
 
 export function addReview(input) {
-  const review = { id: uuid(), ...input, createdAt: new Date().toISOString() };
+  const rating = Number(input.rating);
+  if (!Number.isFinite(rating)) {
+    throw new Error("Please provide a rating between 1 and 5");
+  }
+
+  const clampedRating = Math.min(5, Math.max(1, rating));
+  if (clampedRating !== rating) {
+    throw new Error("Rating must be between 1 and 5");
+  }
+
+  const review = {
+    id: uuid(),
+    ...input,
+    rating: clampedRating,
+    createdAt: new Date().toISOString()
+  };
   reviews.unshift(review);
   save(STORAGE_KEYS.reviews, reviews);
   return review;
