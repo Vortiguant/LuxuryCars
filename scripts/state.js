@@ -88,6 +88,41 @@ async function ensureHashedUsers() {
 
 const usersReady = ensureHashedUsers();
 
+function normalizeReviews() {
+  const source = Array.isArray(reviews) ? reviews : seedReviews;
+  const sanitized = [];
+  let changed = !Array.isArray(reviews);
+
+  for (const review of source) {
+    if (!review || typeof review !== "object") {
+      changed = true;
+      continue;
+    }
+
+    const ratingNumber = Number(review.rating);
+    if (!Number.isFinite(ratingNumber)) {
+      changed = true;
+      continue;
+    }
+
+    const clampedRating = Math.min(5, Math.max(1, ratingNumber));
+    if (clampedRating !== ratingNumber) changed = true;
+
+    sanitized.push({
+      ...review,
+      rating: clampedRating,
+      createdAt: review.createdAt || new Date().toISOString()
+    });
+  }
+
+  reviews = sanitized;
+  if (changed) {
+    save(STORAGE_KEYS.reviews, reviews);
+  }
+}
+
+normalizeReviews();
+
 export function getSession() {
   return session;
 }
@@ -227,9 +262,13 @@ export function getReviews() {
 }
 
 export function getAverageRating() {
-  if (!reviews.length) return 0;
-  const total = reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0);
-  return (total / reviews.length).toFixed(1);
+  const numericRatings = reviews
+    .map((r) => Number(r.rating))
+    .filter((rating) => Number.isFinite(rating) && rating > 0);
+
+  if (!numericRatings.length) return 0;
+  const total = numericRatings.reduce((sum, rating) => sum + rating, 0);
+  return (total / numericRatings.length).toFixed(1);
 }
 
 export function toggleCompare(vehicleId) {
