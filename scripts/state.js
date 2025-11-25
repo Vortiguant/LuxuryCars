@@ -6,7 +6,6 @@ const STORAGE_KEYS = {
   bookings: "lux-bookings",
   reviews: "lux-reviews",
   compare: "lux-compare",
-  chat: "lux-chat",
   contacts: "lux-contact"
 };
 
@@ -37,7 +36,6 @@ let users = load(STORAGE_KEYS.users, seedUsers);
 let reviews = load(STORAGE_KEYS.reviews, seedReviews);
 let bookings = load(STORAGE_KEYS.bookings, []);
 let compare = load(STORAGE_KEYS.compare, []);
-let chat = load(STORAGE_KEYS.chat, []);
 let contacts = load(STORAGE_KEYS.contacts, []);
 let session = load(STORAGE_KEYS.session, null);
 
@@ -172,26 +170,6 @@ export function getCompare() {
 
 export function getCompareVehicles() {
   return compare.map((id) => vehicles.find((v) => v.id === id)).filter(Boolean);
-}
-
-export function addChatMessage(message) {
-  const entry = { id: uuid(), message, createdAt: new Date().toISOString(), role: "guest" };
-  chat.push(entry);
-  save(STORAGE_KEYS.chat, chat);
-  // simple concierge echo
-  const response = {
-    id: uuid(),
-    message: "Concierge received your note. We will secure availability and confirm shortly.",
-    createdAt: new Date().toISOString(),
-    role: "concierge"
-  };
-  chat.push(response);
-  save(STORAGE_KEYS.chat, chat);
-  return entry;
-}
-
-export function getChatHistory() {
-  return chat;
 }
 
 export function addContact(entry) {
