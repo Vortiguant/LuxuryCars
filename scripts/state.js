@@ -88,6 +88,12 @@ export function getBrands() {
   return Array.from(new Set(vehicles.map((v) => v.brand)));
 }
 
+function isWithinAvailability(car, from, to) {
+  if (from && new Date(from) < new Date(car.availableFrom)) return false;
+  if (to && new Date(to) > new Date(car.availableTo)) return false;
+  return true;
+}
+
 export function filterVehicles(criteria = {}) {
   const { brand, type, price, from, to, features = [], special } = criteria;
   return vehicles.filter((car) => {
@@ -96,10 +102,19 @@ export function filterVehicles(criteria = {}) {
     if (price && car.pricePerDay > price) return false;
     if (special && !car.isSpecial) return false;
     if (features.length && !features.every((f) => car.features.includes(f))) return false;
-    if (from && new Date(from) < new Date(car.availableFrom)) return false;
-    if (to && new Date(to) > new Date(car.availableTo)) return false;
+    if (!isWithinAvailability(car, from, to)) return false;
     return true;
   });
+}
+
+export function getVehicle(vehicleId) {
+  return vehicles.find((v) => v.id === vehicleId) || null;
+}
+
+export function isVehicleAvailable(vehicleId, from, to) {
+  const vehicle = getVehicle(vehicleId);
+  if (!vehicle) return false;
+  return isWithinAvailability(vehicle, from, to);
 }
 
 export function createBooking(vehicleId, payload) {

@@ -16,7 +16,9 @@ import {
   addContact,
   getAdminTables,
   getAnalytics,
-  updateProfile
+  updateProfile,
+  getVehicle,
+  isVehicleAvailable
 } from "./state.js";
 import { renderVehicles, renderComparison, renderReviews, renderAdminTables, setMetrics, setAverageRating } from "./ui.js";
 
@@ -200,10 +202,41 @@ function attachBooking() {
     e.preventDefault();
     const data = new FormData(bookingForm);
     const extras = data.getAll("extras");
+
+    const from = data.get("from");
+    const to = data.get("to");
+    const fromDate = from ? new Date(from) : null;
+    const toDate = to ? new Date(to) : null;
+    const fromTime = fromDate?.getTime();
+    const toTime = toDate?.getTime();
+    const vehicle = getVehicle(selectedVehicle);
+
+    if (!from || !to || Number.isNaN(fromTime) || Number.isNaN(toTime)) {
+      showToast("Please select pickup and return dates");
+      return;
+    }
+
+    if (toTime <= fromTime) {
+      showToast("Return date must be after pickup date");
+      return;
+    }
+
+    if (!vehicle) {
+      showToast("Unable to find selected vehicle");
+      return;
+    }
+
+    if (!isVehicleAvailable(selectedVehicle, from, to)) {
+      showToast(
+        `This vehicle is available between ${vehicle.availableFrom} and ${vehicle.availableTo}`
+      );
+      return;
+    }
+
     try {
       const booking = createBooking(selectedVehicle, {
-        from: data.get("from"),
-        to: data.get("to"),
+        from,
+        to,
         location: data.get("location"),
         extras,
         gateway: selectedGateway
