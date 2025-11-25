@@ -37,6 +37,7 @@ const bookingConfirmation = document.getElementById("booking-confirmation");
 const authModal = document.getElementById("auth-modal");
 const profileModal = document.getElementById("profile-modal");
 const profileForm = document.getElementById("profile-form");
+const adminSection = document.getElementById("admin");
 const toast = document.getElementById("toast");
 const reviewGrid = document.getElementById("review-grid");
 const reviewForm = document.getElementById("review-form");
@@ -53,6 +54,37 @@ let activeFeatures = [];
 let selectedGateway = "stripe";
 let resultsCache = [];
 let heroIndex = -1;
+
+function isAdminSession() {
+  return currentUser()?.role === "admin";
+}
+
+function clearAdminContent() {
+  document.getElementById("admin-fleet")?.replaceChildren();
+  document.getElementById("admin-bookings")?.replaceChildren();
+  document.getElementById("admin-reviews")?.replaceChildren();
+  document.getElementById("metric-occupancy")?.textContent = "--";
+  document.getElementById("metric-ticket")?.textContent = "--";
+  document.getElementById("metric-nps")?.textContent = "--";
+}
+
+function syncAdminDashboard() {
+  if (!adminSection) return;
+  const isAdmin = isAdminSession();
+  adminSection.classList.toggle("hidden", !isAdmin);
+  if (!isAdmin) {
+    clearAdminContent();
+    return;
+  }
+  renderAdminTables(getAdminTables());
+  setMetrics(getAnalytics());
+}
+
+function refreshAdminDataIfActive() {
+  if (!isAdminSession()) return;
+  renderAdminTables(getAdminTables());
+  setMetrics(getAnalytics());
+}
 
 function showToast(message) {
   if (!toast) return;
@@ -245,8 +277,7 @@ function attachBooking() {
       bookingRef.textContent = `Reference: ${booking.id} · Email confirmation dispatched.`;
       bookingStep.classList.add("hidden");
       bookingConfirmation.classList.remove("hidden");
-      renderAdminTables(getAdminTables());
-      setMetrics(getAnalytics());
+      refreshAdminDataIfActive();
       showToast("Booking confirmed");
     } catch (err) {
       showToast(err.message);
@@ -353,6 +384,7 @@ function updateSessionUI() {
     document.getElementById("nav-profile")?.remove();
     document.getElementById("nav-logout")?.remove();
   }
+  syncAdminDashboard();
 }
 
 function attachProfile() {
@@ -388,7 +420,7 @@ function attachReviews() {
     setAverageRating(getAverageRating(), getReviews().length);
     reviewForm.reset();
     showToast("Review submitted for moderation");
-    renderAdminTables(getAdminTables());
+    refreshAdminDataIfActive();
   });
 }
 
@@ -540,11 +572,6 @@ function attachPageTransitions() {
   });
 }
 
-function initAdmin() {
-  renderAdminTables(getAdminTables());
-  setMetrics(getAnalytics());
-}
-
 function init() {
   attachPageTransitions();
   populateBrandOptions();
@@ -559,7 +586,6 @@ function init() {
   attachNav();
   animateScroll();
   updateSessionUI();
-  initAdmin();
   applyFilters();
   renderComparison(compareSlots, getCompareVehicles());
   cycleHero();
