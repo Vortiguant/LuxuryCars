@@ -11,7 +11,6 @@ import {
   logoutUser,
   createBooking,
   addReview,
-  getReviews,
   getAverageRating,
   addContact,
   getAdminTables,
@@ -19,6 +18,10 @@ import {
   updateProfile,
   getVehicle,
   isVehicleAvailable,
+  updateBookingStatus,
+  updateVehicleRate,
+  moderateReview,
+  getPublicReviews
   getUsers,
   updateUserRole,
   updateUserPassword
@@ -66,6 +69,11 @@ let selectedGateway = "stripe";
 let resultsCache = [];
 let heroIndex = -1;
 
+function refreshOperationalUI() {
+  renderAdminTables(getAdminTables());
+  setMetrics(getAnalytics());
+  renderReviews(reviewGrid, getPublicReviews());
+  setAverageRating(getAverageRating(), getPublicReviews().length);
 function isAdminSession() {
   return currentUser()?.role === "admin";
 }
@@ -288,6 +296,7 @@ function attachBooking() {
       bookingRef.textContent = `Reference: ${booking.id} · Email confirmation dispatched.`;
       bookingStep.classList.add("hidden");
       bookingConfirmation.classList.remove("hidden");
+      refreshOperationalUI();
       refreshAdminDataIfActive();
       showToast("Booking confirmed");
     } catch (err) {
@@ -512,21 +521,20 @@ function attachAdminManagement() {
 }
 
 function attachReviews() {
-  const reviews = getReviews();
+  const reviews = getPublicReviews();
   renderReviews(reviewGrid, reviews);
   setAverageRating(getAverageRating(), reviews.length);
 
   reviewForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const data = new FormData(reviewForm);
-    const review = addReview({
+    addReview({
       name: data.get("name"),
       bookingId: data.get("bookingId"),
       rating: Number(data.get("rating")),
       feedback: data.get("feedback")
     });
-    renderReviews(reviewGrid, getReviews());
-    setAverageRating(getAverageRating(), getReviews().length);
+    refreshOperationalUI();
     reviewForm.reset();
     showToast("Review submitted for moderation");
     refreshAdminDataIfActive();
@@ -681,6 +689,50 @@ function attachPageTransitions() {
   });
 }
 
+function initAdmin() {
+  refreshOperationalUI();
+}
+
+function attachAdminActions() {
+  document.getElementById("admin-fleet")?.addEventListener("click", (event) => {
+    const priceBtn = event.target.closest('[data-action="edit-price"]');
+    if (!priceBtn) return;
+    const nextRate = prompt("Set new daily rate", priceBtn.dataset.price);
+    if (nextRate === null) return;
+    try {
+      updateVehicleRate(priceBtn.dataset.id, nextRate);
+      refreshOperationalUI();
+      showToast("Rate updated");
+    } catch (err) {
+      showToast(err.message);
+    }
+  });
+
+  document.getElementById("admin-bookings")?.addEventListener("click", (event) => {
+    const statusBtn = event.target.closest('[data-action="booking-status"]');
+    if (!statusBtn) return;
+    try {
+      updateBookingStatus(statusBtn.dataset.id, statusBtn.dataset.status);
+      refreshOperationalUI();
+      showToast(`Booking ${statusBtn.dataset.status}`);
+    } catch (err) {
+      showToast(err.message);
+    }
+  });
+
+  document.getElementById("admin-reviews")?.addEventListener("click", (event) => {
+    const reviewBtn = event.target.closest('[data-action="review-status"]');
+    if (!reviewBtn) return;
+    try {
+      moderateReview(reviewBtn.dataset.id, reviewBtn.dataset.status);
+      refreshOperationalUI();
+      showToast(`Review ${reviewBtn.dataset.status}`);
+    } catch (err) {
+      showToast(err.message);
+    }
+  });
+}
+
 function init() {
   attachPageTransitions();
   populateBrandOptions();
@@ -692,6 +744,7 @@ function init() {
   attachReviews();
   attachContact();
   attachProfile();
+  attachAdminActions();
   attachAdminManagement();
   attachNav();
   animateScroll();

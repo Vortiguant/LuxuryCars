@@ -102,6 +102,9 @@ export function renderAdminTables(tables) {
           <span>${f.brand} ${f.model}</span>
           <span>$${f.pricePerDay}/day</span>
           <span>${f.bookings} upcoming</span>
+          <div class="row-actions">
+            <button class="ghost sm" data-action="edit-price" data-id="${f.id}" data-price="${f.pricePerDay}">Edit rate</button>
+          </div>
         </div>
       `
     )
@@ -114,7 +117,12 @@ export function renderAdminTables(tables) {
           <span>${b.id}</span>
           <span>${b.vehicleId}</span>
           <span>${b.from} → ${b.to}</span>
-          <span class="badge">${b.status}</span>
+          <div class="row-actions">
+            <span class="badge">${b.status}</span>
+            <button class="ghost sm" data-action="booking-status" data-id="${b.id}" data-status="in-progress">In progress</button>
+            <button class="ghost sm" data-action="booking-status" data-id="${b.id}" data-status="completed">Complete</button>
+            <button class="ghost sm" data-action="booking-status" data-id="${b.id}" data-status="cancelled">Cancel</button>
+          </div>
         </div>
       `
     )
@@ -127,7 +135,11 @@ export function renderAdminTables(tables) {
           <span>${r.name}</span>
           <span>${r.rating}★</span>
           <span>${r.bookingId}</span>
-          <span>${new Date(r.createdAt).toLocaleDateString()}</span>
+          <div class="row-actions">
+            <span class="badge">${r.status || "pending"}</span>
+            <button class="ghost sm" data-action="review-status" data-id="${r.id}" data-status="approved">Approve</button>
+            <button class="ghost sm" data-action="review-status" data-id="${r.id}" data-status="rejected">Reject</button>
+          </div>
         </div>
       `
     )
