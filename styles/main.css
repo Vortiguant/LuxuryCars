@@ -977,6 +977,7 @@ input[type="checkbox"] {
   border-radius: 999px;
   filter: blur(40px);
   opacity: 0.5;
+  pointer-events: none;
 }
 
 .auth-shell::before {
