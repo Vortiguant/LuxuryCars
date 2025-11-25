@@ -134,17 +134,6 @@ export function renderAdminTables(tables) {
     .join("");
 }
 
-export function renderChat(container, history) {
-  container.innerHTML = "";
-  history.forEach((entry) => {
-    const bubble = document.createElement("div");
-    bubble.className = `bubble ${entry.role}`;
-    bubble.textContent = entry.message;
-    container.appendChild(bubble);
-  });
-  container.scrollTop = container.scrollHeight;
-}
-
 export function setMetrics({ occupancy, ticket, nps }) {
   document.getElementById("metric-occupancy").textContent = `${occupancy}%`;
   document.getElementById("metric-ticket").textContent = `$${ticket}`;

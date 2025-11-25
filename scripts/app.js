@@ -13,14 +13,12 @@ import {
   addReview,
   getReviews,
   getAverageRating,
-  addChatMessage,
-  getChatHistory,
   addContact,
   getAdminTables,
   getAnalytics,
   updateProfile
 } from "./state.js";
-import { renderVehicles, renderComparison, renderReviews, renderChat, renderAdminTables, setMetrics, setAverageRating } from "./ui.js";
+import { renderVehicles, renderComparison, renderReviews, renderAdminTables, setMetrics, setAverageRating } from "./ui.js";
 
 const vehicleGrid = document.getElementById("vehicle-grid");
 const compareSlots = document.getElementById("compare-slots");
@@ -40,8 +38,6 @@ const profileForm = document.getElementById("profile-form");
 const toast = document.getElementById("toast");
 const reviewGrid = document.getElementById("review-grid");
 const reviewForm = document.getElementById("review-form");
-const chatBody = document.getElementById("chat-body");
-const chatForm = document.getElementById("chat-form");
 const brandSelect = filtersForm?.querySelector("select[name='brand']");
 const navToggle = document.querySelector(".nav-toggle");
 const navLinks = document.querySelector(".nav-links");
@@ -376,21 +372,6 @@ function attachContact() {
   });
 }
 
-function attachChat() {
-  renderChat(chatBody, getChatHistory());
-  chatForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const data = new FormData(chatForm);
-    const message = data.get("message");
-    addChatMessage(message);
-    renderChat(chatBody, getChatHistory());
-    chatForm.reset();
-  });
-  document.getElementById("toggle-chat").addEventListener("click", () => {
-    document.getElementById("chat-widget").classList.toggle("collapsed");
-  });
-}
-
 function attachNav() {
   navToggle.addEventListener("click", () => {
     navLinks.classList.toggle("open");
@@ -447,7 +428,6 @@ function init() {
   attachAuth();
   attachReviews();
   attachContact();
-  attachChat();
   attachProfile();
   attachNav();
   animateScroll();
