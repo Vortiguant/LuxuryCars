@@ -882,6 +882,18 @@ input[type="checkbox"] {
   color: var(--muted);
 }
 
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.ghost.sm {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
 .stats {
   display: grid;
   gap: 8px;

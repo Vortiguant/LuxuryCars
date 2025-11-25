@@ -1,4 +1,4 @@
-import { vehicles, seedReviews, seedUsers } from "./data.js";
+import { vehicles as seedFleet, seedReviews, seedUsers } from "./data.js";
 
 const STORAGE_KEYS = {
   users: "lux-users",
@@ -6,7 +6,8 @@ const STORAGE_KEYS = {
   bookings: "lux-bookings",
   reviews: "lux-reviews",
   compare: "lux-compare",
-  contacts: "lux-contact"
+  contacts: "lux-contact",
+  fleet: "lux-fleet"
 };
 
 const hasStorage = typeof localStorage !== "undefined";
@@ -63,6 +64,7 @@ let bookings = load(STORAGE_KEYS.bookings, []);
 let compare = load(STORAGE_KEYS.compare, []);
 let contacts = load(STORAGE_KEYS.contacts, []);
 let session = load(STORAGE_KEYS.session, null);
+let fleet = load(STORAGE_KEYS.fleet, seedFleet);
 
 async function ensureHashedUsers() {
   const transformed = [];
@@ -111,6 +113,7 @@ function normalizeReviews() {
     sanitized.push({
       ...review,
       rating: clampedRating,
+      status: review.status || "approved",
       createdAt: review.createdAt || new Date().toISOString()
     });
   }
@@ -173,7 +176,7 @@ export function updateProfile({ name, email }) {
 }
 
 export function getBrands() {
-  return Array.from(new Set(vehicles.map((v) => v.brand)));
+  return Array.from(new Set(fleet.map((v) => v.brand)));
 }
 
 function isWithinAvailability(car, from, to) {
@@ -184,7 +187,7 @@ function isWithinAvailability(car, from, to) {
 
 export function filterVehicles(criteria = {}) {
   const { brand, type, price, from, to, features = [], special } = criteria;
-  return vehicles.filter((car) => {
+  return fleet.filter((car) => {
     if (brand && car.brand !== brand) return false;
     if (type && car.type !== type) return false;
     if (price && car.pricePerDay > price) return false;
@@ -196,7 +199,7 @@ export function filterVehicles(criteria = {}) {
 }
 
 export function getVehicle(vehicleId) {
-  return vehicles.find((v) => v.id === vehicleId) || null;
+  return fleet.find((v) => v.id === vehicleId) || null;
 }
 
 export function isVehicleAvailable(vehicleId, from, to) {
@@ -208,7 +211,7 @@ export function isVehicleAvailable(vehicleId, from, to) {
 export function createBooking(vehicleId, payload) {
   const user = currentUser();
   if (!user) throw new Error("Login required");
-  const vehicle = vehicles.find((v) => v.id === vehicleId);
+  const vehicle = fleet.find((v) => v.id === vehicleId);
   if (!vehicle) throw new Error("Vehicle not found");
   const booking = {
     id: `BK-${Math.floor(Math.random() * 900 + 100)}`,
@@ -250,6 +253,7 @@ export function addReview(input) {
     id: uuid(),
     ...input,
     rating: clampedRating,
+    status: "pending",
     createdAt: new Date().toISOString()
   };
   reviews.unshift(review);
@@ -262,7 +266,7 @@ export function getReviews() {
 }
 
 export function getAverageRating() {
-  const numericRatings = reviews
+  const numericRatings = getPublicReviews()
     .map((r) => Number(r.rating))
     .filter((rating) => Number.isFinite(rating) && rating > 0);
 
@@ -291,7 +295,7 @@ export function getCompare() {
 }
 
 export function getCompareVehicles() {
-  return compare.map((id) => vehicles.find((v) => v.id === id)).filter(Boolean);
+  return compare.map((id) => fleet.find((v) => v.id === id)).filter(Boolean);
 }
 
 export function addContact(entry) {
@@ -300,21 +304,21 @@ export function addContact(entry) {
 }
 
 export function getAdminTables() {
-  const fleet = vehicles.map((v) => {
+  const fleetTable = fleet.map((v) => {
     const futureBookings = bookings.filter((b) => b.vehicleId === v.id);
     return { ...v, bookings: futureBookings.length };
   });
-  return { fleet, bookings, reviews };
+  return { fleet: fleetTable, bookings, reviews };
 }
 
 export function getAnalytics() {
-  const occupancy = Math.min(100, Math.round((bookings.length / (vehicles.length * 3)) * 100));
+  const occupancy = Math.min(100, Math.round((bookings.length / (fleet.length * 3)) * 100));
   const ticket =
     bookings.length === 0
       ? 0
       : Math.round(
           bookings.reduce((sum, b) => {
-            const vehicle = vehicles.find((v) => v.id === b.vehicleId);
+            const vehicle = fleet.find((v) => v.id === b.vehicleId);
             return sum + (vehicle?.pricePerDay || 0);
           }, 0) / bookings.length
         );
@@ -323,4 +327,55 @@ export function getAnalytics() {
     ticket,
     nps: 78
   };
+}
+
+export function updateBookingStatus(bookingId, status) {
+  const allowedStatuses = ["confirmed", "in-progress", "completed", "cancelled"];
+  if (!allowedStatuses.includes(status)) throw new Error("Unsupported status");
+
+  let changed = false;
+  bookings = bookings.map((booking) => {
+    if (booking.id !== bookingId) return booking;
+    changed = true;
+    return { ...booking, status };
+  });
+
+  if (changed) save(STORAGE_KEYS.bookings, bookings);
+  return bookings;
+}
+
+export function updateVehicleRate(vehicleId, pricePerDay) {
+  const numericRate = Number(pricePerDay);
+  if (!Number.isFinite(numericRate) || numericRate <= 0) {
+    throw new Error("Daily rate must be a positive number");
+  }
+
+  let changed = false;
+  fleet = fleet.map((vehicle) => {
+    if (vehicle.id !== vehicleId) return vehicle;
+    changed = true;
+    return { ...vehicle, pricePerDay: Math.round(numericRate) };
+  });
+
+  if (changed) save(STORAGE_KEYS.fleet, fleet);
+  return fleet;
+}
+
+export function moderateReview(reviewId, status) {
+  const allowed = ["approved", "rejected", "pending"];
+  if (!allowed.includes(status)) throw new Error("Unsupported review status");
+
+  let changed = false;
+  reviews = reviews.map((review) => {
+    if (review.id !== reviewId) return review;
+    changed = true;
+    return { ...review, status };
+  });
+
+  if (changed) save(STORAGE_KEYS.reviews, reviews);
+  return reviews;
+}
+
+export function getPublicReviews() {
+  return reviews.filter((r) => r.status === "approved");
 }
