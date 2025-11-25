@@ -526,6 +526,7 @@ function attachPageTransitions() {
       });
       return;
     }
+    if (!href || isHashLink || link.target === "_blank") return;
 
     link.addEventListener("click", (event) => {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
