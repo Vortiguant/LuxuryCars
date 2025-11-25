@@ -690,39 +690,100 @@ input[type="checkbox"] {
   font-weight: 700;
 }
 
+.reviews {
+  position: relative;
+  isolation: isolate;
+}
+
+.reviews::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 18% 20%, rgba(213, 178, 87, 0.16), transparent 30%),
+    radial-gradient(circle at 82% 10%, rgba(93, 213, 255, 0.15), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+  filter: blur(10px);
+  z-index: -1;
+}
+
+.reviews .section-header {
+  align-items: flex-start;
+}
+
 .reviews .review-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
 }
 
 .review {
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--stroke);
+  padding: 18px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius);
+  position: relative;
+  overflow: hidden;
+}
+
+.review::before {
+  content: "\201C";
+  position: absolute;
+  font-family: "Playfair Display", serif;
+  font-size: 54px;
+  color: rgba(213, 178, 87, 0.15);
+  top: -10px;
+  left: 12px;
+}
+
+.review p {
+  margin: 10px 0;
+}
+
+.review small {
+  color: var(--muted);
 }
 
 .review-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+}
+
+.review-head strong {
+  font-size: 18px;
 }
 
 .rating-aggregate {
-  padding: 12px 14px;
-  border-radius: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: radial-gradient(circle at 20% 20%, rgba(213, 178, 87, 0.18), transparent 45%),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: var(--shadow);
+  display: inline-flex;
+  gap: 14px;
+}
+
+.review-form {
+  margin-top: 24px;
+  padding: 22px;
+  border-radius: var(--radius);
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03);
   box-shadow: var(--shadow);
 }
 
-.review-form {
-  margin-top: 20px;
-  padding: 20px;
-  border-radius: var(--radius);
-  border: 1px solid var(--stroke);
-  background: rgba(255, 255, 255, 0.02);
+.review-form form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 14px;
+}
+
+.review-form textarea,
+.review-form button {
+  grid-column: 1 / -1;
 }
 
 .about-grid {
