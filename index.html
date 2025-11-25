@@ -330,7 +330,7 @@
             <h2>Operational dashboard.</h2>
             <p>Manage fleet, bookings, guests, and reviews with live moderation controls.</p>
           </div>
-          <div class="pill">Role: Admin</div>
+          <div class="pill" id="admin-role-pill">Role: Guest</div>
         </div>
         <div class="admin-grid">
           <div class="glass">
@@ -497,6 +497,26 @@
         <label>Email<input type="email" name="email" required></label>
         <button class="primary" type="submit">Save profile</button>
       </form>
+      <div class="security-card">
+        <h4>Security</h4>
+        <p class="muted">Update your password. It will be hashed before we store it locally.</p>
+        <form id="self-password-form" class="stacked">
+          <label>New password<input type="password" id="self-new-password" minlength="8" required></label>
+          <button class="ghost" type="submit">Update password</button>
+        </form>
+      </div>
+      <div class="security-card hidden" id="admin-user-panel">
+        <h4>Admin controls</h4>
+        <p class="muted">Promote or demote accounts and reset credentials securely.</p>
+        <div id="admin-user-list" class="user-table"></div>
+        <form id="password-reset-form" class="stacked">
+          <label>User
+            <select id="password-user" required></select>
+          </label>
+          <label>New password<input type="password" id="password-new" minlength="8" required></label>
+          <button class="primary" type="submit">Reset password</button>
+        </form>
+      </div>
       <small class="muted">Profile updates stay local; connect your identity provider in production.</small>
     </div>
   </div>

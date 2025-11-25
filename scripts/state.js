@@ -172,6 +172,47 @@ export function updateProfile({ name, email }) {
   return user;
 }
 
+export function getUsers() {
+  return users.map(({ password, ...rest }) => rest);
+}
+
+export async function updateUserPassword(userId, newPassword) {
+  await usersReady;
+  const actor = currentUser();
+  const isSelf = actor?.id === userId;
+
+  if (!actor) throw new Error("Login required");
+  if (!isSelf && actor.role !== "admin") throw new Error("Admin privileges required");
+  if (!newPassword || newPassword.length < 8) {
+    throw new Error("Password must be at least 8 characters");
+  }
+
+  const user = users.find((u) => u.id === userId);
+  if (!user) throw new Error("User not found");
+
+  const hashedPassword = await hashPassword(newPassword);
+  const updatedUser = { ...user, password: hashedPassword };
+  users = users.map((u) => (u.id === userId ? updatedUser : u));
+  save(STORAGE_KEYS.users, users);
+  return { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, role: updatedUser.role };
+}
+
+export async function updateUserRole(userId, role) {
+  await usersReady;
+  const actor = currentUser();
+  if (!actor || actor.role !== "admin") throw new Error("Admin privileges required");
+  const allowedRoles = ["guest", "admin"];
+  if (!allowedRoles.includes(role)) throw new Error("Invalid role");
+
+  const user = users.find((u) => u.id === userId);
+  if (!user) throw new Error("User not found");
+
+  const updatedUser = { ...user, role };
+  users = users.map((u) => (u.id === userId ? updatedUser : u));
+  save(STORAGE_KEYS.users, users);
+  return { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, role: updatedUser.role };
+}
+
 export function getBrands() {
   return Array.from(new Set(vehicles.map((v) => v.brand)));
 }
