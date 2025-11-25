@@ -755,6 +755,26 @@ input[type="checkbox"] {
   font-size: 18px;
 }
 
+.review .badge {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 72px;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(213, 178, 87, 0.9), rgba(243, 224, 163, 0.9));
+  color: #0b0c12;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+}
+
+.review-head strong {
+  font-size: 18px;
+}
+
 .rating-aggregate {
   padding: 14px 16px;
   border-radius: 18px;
