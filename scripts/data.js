@@ -133,6 +133,30 @@ export const seedReviews = [
     rating: 5,
     feedback: "Identity check and payment were seamless. Chauffeur for the Ghost was immaculate.",
     createdAt: "2024-11-03"
+  },
+  {
+    id: "r4",
+    name: "Mateo V.",
+    bookingId: "BK-415",
+    rating: 5,
+    feedback: "Driver change mid-route was handled flawlessly. The Ghost felt brand new.",
+    createdAt: "2024-11-12"
+  },
+  {
+    id: "r5",
+    name: "Priya S.",
+    bookingId: "BK-377",
+    rating: 4,
+    feedback: "Cayenne had winter tyres pre-fitted. Only wish check-in at Linate was faster.",
+    createdAt: "2024-10-22"
+  },
+  {
+    id: "r6",
+    name: "Julian R.",
+    bookingId: "BK-439",
+    rating: 5,
+    feedback: "Concierge pre-loaded Monaco passes and stocked the RS6 with sparkling water.",
+    createdAt: "2024-11-18"
   }
 ];
 
