@@ -46,6 +46,7 @@ const navLinks = document.querySelector(".nav-links");
 const heroTitle = document.querySelector(".hero-visual h3");
 const heroPill = document.querySelector(".hero-visual .pill");
 const heroImage = document.querySelector(".hero-car img");
+const pageTransition = document.getElementById("page-transition");
 
 let selectedVehicle = null;
 let activeFeatures = [];
@@ -447,12 +448,63 @@ function animateScroll() {
   document.querySelectorAll(".card, .glass, .step, .section-header").forEach((el) => observer.observe(el));
 }
 
+function revealPageTransition() {
+  if (!pageTransition) return;
+  pageTransition.classList.add("visible", "is-revealing");
+  pageTransition.addEventListener(
+    "animationend",
+    () => {
+      pageTransition.classList.remove("is-revealing", "visible");
+    },
+    { once: true }
+  );
+}
+
+function navigateWithTransition(href) {
+  if (!pageTransition) {
+    window.location.href = href;
+    return;
+  }
+  pageTransition.classList.remove("is-revealing");
+  pageTransition.classList.add("visible", "is-covering");
+  pageTransition.addEventListener(
+    "animationend",
+    () => {
+      window.location.href = href;
+    },
+    { once: true }
+  );
+}
+
+function attachPageTransitions() {
+  if (!pageTransition) return;
+
+  revealPageTransition();
+
+  document.querySelectorAll("a[href]").forEach((link) => {
+    const href = link.getAttribute("href");
+    const isHashLink = href?.startsWith("#");
+    if (!href || isHashLink || link.target === "_blank") return;
+
+    link.addEventListener("click", (event) => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      navigateWithTransition(link.href);
+    });
+  });
+
+  window.addEventListener("beforeunload", () => {
+    pageTransition.classList.add("visible", "is-covering");
+  });
+}
+
 function initAdmin() {
   renderAdminTables(getAdminTables());
   setMetrics(getAnalytics());
 }
 
 function init() {
+  attachPageTransitions();
   populateBrandOptions();
   bindFilterChips();
   attachFilters();
