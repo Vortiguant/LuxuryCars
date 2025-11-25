@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurum Drive | Luxury Car Rentals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div class="page">
+    <header class="hero" id="top">
+      <nav class="nav">
+        <div class="logo">
+          <span class="logo-mark">A</span>
+          <div>
+            <strong>Aurum Drive</strong>
+            <small>Private Collections</small>
+          </div>
+        </div>
+        <div class="nav-links">
+          <a href="#search">Search</a>
+          <a href="#fleet">Fleet</a>
+          <a href="#reviews">Reviews</a>
+          <a href="#about">About</a>
+          <a href="#contact">Contact</a>
+          <button class="ghost" id="open-auth">Sign in</button>
+          <button class="primary" id="nav-book">Book now</button>
+        </div>
+        <button class="nav-toggle" aria-label="Open navigation">☰</button>
+      </nav>
+
+      <div class="hero-content">
+        <div class="hero-copy">
+          <p class="eyebrow">Private | Bespoke | Secure</p>
+          <h1>Curated luxury cars delivered to your agenda.</h1>
+          <p class="lede">From weeklong escapes on the coast to executive transfers, our concierge team orchestrates every detail—vehicles, timing, and amenities—so you simply arrive and drive.</p>
+          <div class="hero-actions">
+            <button class="primary" id="hero-book">Reserve a vehicle</button>
+            <button class="ghost" id="hero-explore">Explore the fleet</button>
+          </div>
+          <div class="metrics">
+            <div><strong>500+</strong><span>Concierge-managed trips</span></div>
+            <div><strong>24/7</strong><span>Private support</span></div>
+            <div><strong>4.9★</strong><span>Guest satisfaction</span></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="glass card-shadow">
+            <p class="eyebrow">Featured</p>
+            <h3>Aston Martin DB11 Volante</h3>
+            <p class="pill">From $620/day · Convertible · Milano Collection</p>
+            <div class="hero-car">
+              <div class="car-overlay"></div>
+              <img src="https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=900&q=80" alt="Aston Martin DB11 Volante" loading="lazy">
+            </div>
+            <div class="timeline">
+              <div>Delivery</div><div>Drive</div><div>Handback</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="parallax parallax-a"></div>
+      <div class="parallax parallax-b"></div>
+    </header>
+
+    <main>
+      <section id="search" class="section search">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Intelligent search</p>
+            <h2>Find the right statement car.</h2>
+            <p>Filter by brand, body style, pricing, dates, concierge perks, and availability in real time.</p>
+          </div>
+          <div class="search-guides">
+            <span class="pill">PCI-ready checkout</span>
+            <span class="pill">Identity verified</span>
+            <span class="pill">Live availability</span>
+          </div>
+        </div>
+        <form class="filters" id="filters">
+          <label data-tip="Filter by marque" class="tooltip">
+            Brand
+            <select name="brand">
+              <option value="">Any</option>
+            </select>
+          </label>
+          <label data-tip="Choose your driving style" class="tooltip">
+            Type
+            <select name="type">
+              <option value="">Any</option>
+              <option value="suv">SUV</option>
+              <option value="convertible">Convertible</option>
+              <option value="grand-tourer">Grand Tourer</option>
+              <option value="sports">Sports</option>
+              <option value="sedan">Sedan</option>
+            </select>
+          </label>
+          <label data-tip="Daily budget ceiling" class="tooltip">
+            Max price <span id="price-value">$1,500</span>
+            <input type="range" name="price" min="200" max="2000" value="1500">
+          </label>
+          <label data-tip="Pick-up date" class="tooltip">
+            From
+            <input type="date" name="from">
+          </label>
+          <label data-tip="Return date" class="tooltip">
+            To
+            <input type="date" name="to">
+          </label>
+          <label class="tooltip" data-tip="Instant bookable offers">
+            <input type="checkbox" name="special"> Special offers
+          </label>
+          <div class="chip-group" aria-label="Vehicle features">
+            <button type="button" class="chip" data-feature="all-wheel-drive">AWD</button>
+            <button type="button" class="chip" data-feature="massage-seats">Massage seats</button>
+            <button type="button" class="chip" data-feature="convertible">Convertible</button>
+            <button type="button" class="chip" data-feature="track-pack">Track pack</button>
+            <button type="button" class="chip" data-feature="chauffeur">Chauffeur-ready</button>
+          </div>
+          <button class="primary" type="submit">Apply filters</button>
+        </form>
+      </section>
+
+      <section id="fleet" class="section fleet">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Fleet</p>
+            <h2>Signature editions ready to roll.</h2>
+            <p>Every car is verified, detailed, and delivered with concierge-level service.</p>
+          </div>
+          <div class="actions">
+            <label class="tooltip" data-tip="Sort by rate or acclaim">
+              Sort
+              <select id="sort">
+                <option value="featured">Featured</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="rating-desc">Top Rated</option>
+              </select>
+            </label>
+            <input id="search-text" type="search" placeholder="Search brand or model" aria-label="Search brand or model" data-tip="Type to search" class="tooltip">
+          </div>
+        </div>
+        <div id="vehicle-grid" class="card-grid" aria-live="polite"></div>
+        <div class="compare-panel glass">
+          <div>
+            <p class="eyebrow">Comparison</p>
+            <h3>Track shortlisted vehicles side by side.</h3>
+          </div>
+          <div id="compare-slots" class="compare-slots"></div>
+          <button class="ghost" id="clear-compare">Clear comparison</button>
+        </div>
+      </section>
+
+      <section id="booking-guide" class="section guide">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Concierge flow</p>
+            <h2>Booking built to feel inevitable.</h2>
+            <p>Transparent steps, context tips, and payment-grade security indicators lead you through.</p>
+          </div>
+          <div class="pill accent">LIVE · Secure Checkout</div>
+        </div>
+        <div class="steps">
+          <div class="step" data-tip="Choose model, dates, delivery and return points." aria-label="Select vehicle and dates">
+            <span>01</span>
+            <h4>Select & schedule</h4>
+            <p>Realtime availability locks your dates while you review rates and insurance options.</p>
+          </div>
+          <div class="step" data-tip="Identity verification with multi-factor authentication." aria-label="Verify identity">
+            <span>02</span>
+            <h4>Verify</h4>
+            <p>Two-step verification and driver license capture keep handover secure.</p>
+          </div>
+          <div class="step" data-tip="Stripe & PayPal vaulting with PCI-DSS alignment." aria-label="Pay securely">
+            <span>03</span>
+            <h4>Pay</h4>
+            <p>Pay with Stripe or PayPal; tokens stay encrypted, and receipts are issued instantly.</p>
+          </div>
+          <div class="step" data-tip="Concierge coordinates delivery and return." aria-label="Delivery arranged">
+            <span>04</span>
+            <h4>Arrive & drive</h4>
+            <p>We deliver fuelled, detailed, and on time with live chat support throughout.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="reviews" class="section reviews">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Client acclaim</p>
+            <h2>Reviews curated and moderated.</h2>
+          </div>
+          <div class="rating-aggregate">
+            <div class="display-rating" id="avg-rating">4.9</div>
+            <div>
+              <p class="eyebrow">Average rating</p>
+              <p id="review-count">0 verified guests</p>
+            </div>
+          </div>
+        </div>
+        <div id="review-grid" class="review-grid"></div>
+        <div class="glass review-form">
+          <h3>Share your experience</h3>
+          <form id="review-form">
+            <label class="tooltip" data-tip="We keep this private">
+              Name
+              <input type="text" name="name" required>
+            </label>
+            <label class="tooltip" data-tip="Link to your reservation">
+              Booking ID
+              <input type="text" name="bookingId" required>
+            </label>
+            <label class="tooltip" data-tip="Rate your experience">
+              Rating
+              <input type="number" name="rating" min="1" max="5" value="5" required>
+            </label>
+            <label class="tooltip" data-tip="Highlights and feedback">
+              Feedback
+              <textarea name="feedback" rows="3" required></textarea>
+            </label>
+            <button class="primary" type="submit">Submit review</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="about" class="section about">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Our house</p>
+            <h2>Private collection heritage.</h2>
+            <p>Founded in 2011 by former Le Mans engineers, Aurum Drive curates rare vehicles and delivers them with obsessive hospitality.</p>
+          </div>
+          <div class="pill accent">Offices: London · Milan · Los Angeles</div>
+        </div>
+        <div class="about-grid">
+          <div class="glass">
+            <h4>Mission</h4>
+            <p>To choreograph unforgettable drives—pairing precision engineering with human hospitality.</p>
+          </div>
+          <div class="glass">
+            <h4>Team</h4>
+            <ul class="team">
+              <li><strong>Camille Renard</strong><span>Founder · Ex-Aston Martin</span></li>
+              <li><strong>Javier Soto</strong><span>Head of Concierge</span></li>
+              <li><strong>Leena Patel</strong><span>Security & Compliance</span></li>
+              <li><strong>Marcus Tan</strong><span>Fleet Operations</span></li>
+            </ul>
+          </div>
+          <div class="glass">
+            <h4>Heritage</h4>
+            <p>Born from a private club sharing twelve collector vehicles, now a global fleet with bespoke delivery teams in eight cities.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="section faq">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Answers</p>
+            <h2>FAQ: insurance, deposits, and delivery.</h2>
+          </div>
+        </div>
+        <div class="accordion" id="faq-list">
+          <details>
+            <summary>What documents are required?</summary>
+            <p>Valid driver license, government ID, and security deposit authorization via Stripe or PayPal.</p>
+          </details>
+          <details>
+            <summary>Do you deliver to hotels or villas?</summary>
+            <p>Yes. White-glove delivery and key handover at your location, verified by signature and photo.</p>
+          </details>
+          <details>
+            <summary>How is insurance handled?</summary>
+            <p>Fully comprehensive coverage with optional reduced deductible packages and GPS telematics for safety.</p>
+          </details>
+          <details>
+            <summary>Can I extend my booking?</summary>
+            <p>Extension requests are processed in real time; availability is recalculated instantly before payment capture.</p>
+          </details>
+        </div>
+      </section>
+
+      <section id="contact" class="section contact">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Concierge</p>
+            <h2>Speak with a real person.</h2>
+            <p>Private line, instant chat, and curated recommendations within minutes.</p>
+          </div>
+          <div class="contact-meta">
+            <div><strong>+1 (213) 555-0112</strong><span>24/7 concierge</span></div>
+            <div><strong>hello@aurumdrive.com</strong><span>Response in 10 minutes</span></div>
+            <div><strong>Mon–Sun</strong><span>06:00 — 23:00</span></div>
+            <div><strong>88 Grosvenor Rd, London</strong><span>Appointments welcome</span></div>
+          </div>
+        </div>
+        <div class="contact-grid">
+          <form class="glass" id="contact-form">
+            <h3>Contact form</h3>
+            <label class="tooltip" data-tip="Your full name for verification">
+              Name
+              <input type="text" name="name" required>
+            </label>
+            <label class="tooltip" data-tip="We use this for confirmations">
+              Email
+              <input type="email" name="email" required>
+            </label>
+            <label class="tooltip" data-tip="Share context for your trip">
+              Message
+              <textarea name="message" rows="3" required></textarea>
+            </label>
+            <button class="primary" type="submit">Send</button>
+          </form>
+          <div class="map glass">
+            <div class="map-overlay">London · Milan · Los Angeles</div>
+            <iframe title="HQ map" src="https://maps.google.com/maps?q=london&t=&z=10&ie=UTF8&iwloc=&output=embed" loading="lazy"></iframe>
+          </div>
+        </div>
+      </section>
+
+      <section id="admin" class="section admin">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Admin</p>
+            <h2>Operational dashboard.</h2>
+            <p>Manage fleet, bookings, guests, and reviews with live moderation controls.</p>
+          </div>
+          <div class="pill">Role: Admin</div>
+        </div>
+        <div class="admin-grid">
+          <div class="glass">
+            <h4>Fleet at a glance</h4>
+            <div id="admin-fleet" class="table"></div>
+          </div>
+          <div class="glass">
+            <h4>Bookings</h4>
+            <div id="admin-bookings" class="table"></div>
+          </div>
+          <div class="glass">
+            <h4>Reviews moderation</h4>
+            <div id="admin-reviews" class="table"></div>
+          </div>
+          <div class="glass">
+            <h4>Analytics</h4>
+            <div class="stats">
+              <div><span>Occupancy</span><strong id="metric-occupancy">82%</strong></div>
+              <div><span>Avg. ticket</span><strong id="metric-ticket">$1,140</strong></div>
+              <div><span>NPS</span><strong id="metric-nps">78</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <h4>Aurum Drive</h4>
+        <p>Luxury car rentals with concierge-first service.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#faq">FAQ</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <p class="smallprint">PCI-ready payments via Stripe and PayPal · Privacy-first by design.</p>
+    </footer>
+  </div>
+
+  <div class="modal hidden" id="booking-modal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="close" data-close>×</button>
+      <div id="booking-step">
+        <p class="eyebrow">Secure booking</p>
+        <h3 id="booking-title">Reserve</h3>
+        <form id="booking-form">
+          <label class="tooltip" data-tip="Choose your dates">
+            From
+            <input type="date" name="from" required>
+          </label>
+          <label class="tooltip" data-tip="Return date">
+            To
+            <input type="date" name="to" required>
+          </label>
+          <label class="tooltip" data-tip="Delivery address or hotel">
+            Delivery location
+            <input type="text" name="location" required>
+          </label>
+          <fieldset>
+            <legend>Extras</legend>
+            <label><input type="checkbox" name="extras" value="chauffeur"> Chauffeur</label>
+            <label><input type="checkbox" name="extras" value="insurance-plus"> Premium insurance</label>
+            <label><input type="checkbox" name="extras" value="airport-lounge"> Airport lounge</label>
+          </fieldset>
+          <div class="payment">
+            <p>Payment gateway</p>
+            <div class="pay-options">
+              <button type="button" class="chip" data-gateway="stripe">Stripe</button>
+              <button type="button" class="chip" data-gateway="paypal">PayPal</button>
+            </div>
+            <small>PCI alignment in production; cards are tokenized.</small>
+          </div>
+          <button class="primary" type="submit">Confirm & pay</button>
+        </form>
+      </div>
+      <div id="booking-confirmation" class="hidden">
+        <p class="eyebrow">Booked</p>
+        <h3>Confirmation sent</h3>
+        <p id="booking-ref"></p>
+        <button class="ghost" data-close>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="auth-modal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="close" data-close>×</button>
+      <div class="tabs">
+        <button class="tab active" data-tab="login">Login</button>
+        <button class="tab" data-tab="register">Register</button>
+      </div>
+      <form id="login-form" class="auth-form">
+        <label>Email<input type="email" name="email" required></label>
+        <label>Password<input type="password" name="password" required></label>
+        <button class="primary" type="submit">Sign in</button>
+      </form>
+      <form id="register-form" class="auth-form hidden">
+        <label>Name<input type="text" name="name" required></label>
+        <label>Email<input type="email" name="email" required></label>
+        <label>Password<input type="password" name="password" required></label>
+        <button class="primary" type="submit">Create account</button>
+      </form>
+      <div class="auth-note">Sessions are stored securely; profile edits live-sync.</div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="profile-modal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="close" data-close>×</button>
+      <p class="eyebrow">Profile</p>
+      <h3>Your details</h3>
+      <form id="profile-form">
+        <label>Name<input type="text" name="name" required></label>
+        <label>Email<input type="email" name="email" required></label>
+        <button class="primary" type="submit">Save profile</button>
+      </form>
+      <small class="muted">Profile updates stay local; connect your identity provider in production.</small>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <div class="chat-widget" id="chat-widget">
+    <div class="chat-header">
+      <div>
+        <strong>Concierge live chat</strong>
+        <p class="eyebrow">Typically replies in 2 mins</p>
+      </div>
+      <button id="toggle-chat">−</button>
+    </div>
+    <div class="chat-body" id="chat-body"></div>
+    <form id="chat-form" class="chat-input">
+      <input type="text" name="message" placeholder="Ask about availability…" required>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script type="module" src="scripts/app.js"></script>
+</body>
+</html>
